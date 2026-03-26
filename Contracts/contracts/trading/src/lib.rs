@@ -498,11 +498,7 @@ impl UpgradeableTradingContract {
     }
 
     /// Reject an upgrade proposal
-    pub fn reject_upgrade(
-        env: Env,
-        proposal_id: u64,
-        rejector: Address,
-    ) -> Result<(), TradeError> {
+    pub fn reject_upgrade(env: Env, proposal_id: u64, rejector: Address) -> Result<(), TradeError> {
         rejector.require_auth();
         require_initialized(&env)?;
 

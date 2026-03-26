@@ -173,10 +173,7 @@ fn set_global_window_usage(env: &Env, window: u64, count: u32) {
     env.storage().persistent().set(&key, &count);
 }
 
-fn check_and_consume_message_rate_limit(
-    env: &Env,
-    sender: &Address,
-) -> Result<(), MessagingError> {
+fn check_and_consume_message_rate_limit(env: &Env, sender: &Address) -> Result<(), MessagingError> {
     let cfg = read_rate_limit_config(env);
 
     if cfg.window_secs == 0
