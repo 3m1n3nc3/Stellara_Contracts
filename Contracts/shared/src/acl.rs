@@ -21,8 +21,11 @@ impl ACL {
 
     pub fn create_role(env: &Env, role: &Symbol) {
         let key = Self::roles_exist_key(env);
-        let mut roles: Map<Symbol, bool> =
-            env.storage().persistent().get(&key).unwrap_or(Map::new(env));
+        let mut roles: Map<Symbol, bool> = env
+            .storage()
+            .persistent()
+            .get(&key)
+            .unwrap_or(Map::new(env));
 
         roles.set(role.clone(), true);
         env.storage().persistent().set(&key, &roles);
@@ -30,8 +33,11 @@ impl ACL {
 
     pub fn role_exists(env: &Env, role: &Symbol) -> bool {
         let key = Self::roles_exist_key(env);
-        let roles: Map<Symbol, bool> =
-            env.storage().persistent().get(&key).unwrap_or(Map::new(env));
+        let roles: Map<Symbol, bool> = env
+            .storage()
+            .persistent()
+            .get(&key)
+            .unwrap_or(Map::new(env));
 
         roles.get(role.clone()).unwrap_or(false)
     }
@@ -42,8 +48,11 @@ impl ACL {
         }
 
         let key = Self::user_roles_key(env);
-        let mut roles: Map<Address, Vec<Symbol>> =
-            env.storage().persistent().get(&key).unwrap_or(Map::new(env));
+        let mut roles: Map<Address, Vec<Symbol>> = env
+            .storage()
+            .persistent()
+            .get(&key)
+            .unwrap_or(Map::new(env));
 
         let mut user_roles = roles.get(user.clone()).unwrap_or(Vec::new(env));
 
@@ -61,8 +70,11 @@ impl ACL {
         }
 
         let key = Self::role_perms_key(env);
-        let mut perms: Map<Symbol, Vec<Symbol>> =
-            env.storage().persistent().get(&key).unwrap_or(Map::new(env));
+        let mut perms: Map<Symbol, Vec<Symbol>> = env
+            .storage()
+            .persistent()
+            .get(&key)
+            .unwrap_or(Map::new(env));
 
         let mut role_perms = perms.get(role.clone()).unwrap_or(Vec::new(env));
 
@@ -98,8 +110,11 @@ impl ACL {
         }
 
         let key = Self::role_parent_key(env);
-        let mut parents: Map<Symbol, Symbol> =
-            env.storage().persistent().get(&key).unwrap_or(Map::new(env));
+        let mut parents: Map<Symbol, Symbol> = env
+            .storage()
+            .persistent()
+            .get(&key)
+            .unwrap_or(Map::new(env));
 
         parents.set(child.clone(), parent.clone());
         env.storage().persistent().set(&key, &parents);

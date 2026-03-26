@@ -643,8 +643,7 @@ impl UpgradeableMessagingContract {
         proposal_id: u64,
     ) -> Result<UpgradeProposal, MessagingError> {
         require_initialized(&env)?;
-        GovernanceManager::get_proposal(&env, proposal_id)
-            .map_err(|_| MessagingError::Unauthorized)
+        GovernanceManager::get_proposal(&env, proposal_id).map_err(|_| MessagingError::Unauthorized)
     }
 
     pub fn reject_upgrade(
