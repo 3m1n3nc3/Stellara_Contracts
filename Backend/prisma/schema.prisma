@@ -50,8 +50,11 @@ model User {
   tenantMembers       TenantMember[]
   experimentAssignments ExperimentAssignment[]
   verificationSessions VerificationSession[]
-  crossChainSwaps      CrossChainSwap[]
-
+  userLocations        UserLocation[]
+  marginAccount        MarginAccount?
+  clearingMarginAccounts ClearingMarginAccount[]
+  defaultFundContributions DefaultFundContribution[]
+  syntheticCDPs        SyntheticCDP[]
 
   @@unique([tenantId, email])
   @@unique([tenantId, walletAddress])
@@ -477,7 +480,7 @@ model Document {
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
   extractions DocumentExtraction[]
-  audits     AuditLog[]
+  audits     DocumentAuditLog[]
   @@map("documents")
 }
 
@@ -492,14 +495,14 @@ model DocumentExtraction {
   @@map("document_extractions")
 }
 
-model AuditLog {
+model DocumentAuditLog {
   id         String   @id @default(cuid())
   documentId String?  @map("document_id")
   document   Document? @relation(fields: [documentId], references: [id], onDelete: Cascade)
   action     String
   metadata   Json?
   createdAt  DateTime @default(now()) @map("created_at")
-  @@map("audit_logs")
+  @@map("document_audit_logs")
 }
 
 model NotificationDelivery {
@@ -1269,6 +1272,35 @@ model Subscription {
   @@map("subscriptions")
 }
 
+model RevenueRecognition {
+  id             String       @id @default(uuid())
+  subscriptionId String?      @map("subscription_id")
+  subscription   Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  invoiceId      String?      @map("invoice_id")
+  invoice        Invoice?     @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  amount         Int
+  currency       String       @default("usd")
+  recognizedAt   DateTime     @map("recognized_at")
+  createdAt      DateTime     @default(now()) @map("created_at")
+
+  @@index([subscriptionId])
+  @@index([invoiceId])
+  @@map("revenue_recognitions")
+}
+
+model ProrationAdjustment {
+  id             String       @id @default(uuid())
+  subscriptionId String       @map("subscription_id")
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  amount         Int
+  description    String?
+  appliedAt      DateTime     @map("applied_at")
+  createdAt      DateTime     @default(now()) @map("created_at")
+
+  @@index([subscriptionId])
+  @@map("proration_adjustments")
+}
+
 model UsageRecord {
   id                  String       @id @default(uuid())
   subscriptionId      String       @map("subscription_id")
@@ -1828,6 +1860,7 @@ enum DocumentType {
   PASSPORT
   DRIVERS_LICENSE
   NATIONAL_ID
+}
 
 // ─── Predictive Settlement Engine ───────────────────────────────────────────
 
@@ -1991,7 +2024,7 @@ model ChainAdapter {
   blockchain            SupportedBlockchain @unique
   rpcEndpoint           String   @map("rpc_endpoint")
   wsEndpoint            String?  @map("ws_endpoint")
-  chainId               String   @map("chain_id")
+  chainId               String   @unique @map("chain_id")
   explorerUrl           String?  @map("explorer_url")
   isActive              Boolean  @default(true) @map("is_active")
   finalityBlocks        Int      @default(12) @map("finality_blocks") // blocks until finality
